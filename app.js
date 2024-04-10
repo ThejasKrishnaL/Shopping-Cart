@@ -4,6 +4,11 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const { engine : hbs } = require("express-handlebars")
+var db = require('./config/connection')
+
+
+
+
 var fileUpload = require('express-fileupload')
 var userRouter = require('./routes/user');
 var adminRouter = require('./routes/admin');
@@ -29,7 +34,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
+db.connect((err)=>{
+  if(err) console.log("Connection Error "+err);
+  else console.log("Database Connected to 27017");
+  
+})
 app.use('/', userRouter);
 app.use('/admin', adminRouter);
 

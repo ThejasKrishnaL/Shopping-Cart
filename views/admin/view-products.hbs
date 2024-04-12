@@ -4,35 +4,39 @@
             <a href="/admin/add-product" style="width: 145px;margin-left:auto;" class="btn btn-success">Add Product</a>
         </div>
 
-            <table class="table mt-5">
-                <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Description</th>
-                        <th scope="col">Category</th>
-                        <th scope="col">Price</th>
-                        <th scope="col">Image</th>
-                    </tr>
-                </thead>
-                <tbody>
+        <table class="table mt-5">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Category</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Image</th>
+                </tr>
+            </thead>
+            <tbody>
 
-                    {{#each products}}
+                {{#each products}}
 
-                    <tr>
-                        <th scope="row">1</th>
-                        <td>{{this.Name}}</td>
-                        <td>{{this.Description}}</td>
-                        <td>{{this.Category}}</td>
-                        <td>{{this.Price}}</td>
-                        <td>
-                            <img style="width:50px;" src="/product-images/{{this._id}}.jpg">
-                        </td>
-                    </tr>
+                <tr>
+                    <th scope="row">1</th>
+                    <td>{{this.Name}}</td>
+                    <td style="width:400px;">{{this.Description}}</td>
+                    <td>{{this.Category}}</td>
+                    <td>{{this.Price}}</td>
+                    <td>
+                        <img style="width:50px;" src="/product-images/{{this._id}}.jpg">
+                    </td>
+                    <td>
+                        <a href="/admin/edit-product/{{this._id}}" class="btn btn-primary">Edit</a>
+                        <a href="/admin/delete-product/{{this._id}}" class="btn btn-danger" onclick="return confirm('Are You Sure to Delete this {{this.Name}}?')">Delete</a>
+                    </td>
+                </tr>
 
-                    {{/each}}
+                {{/each}}
 
-                </tbody>
-            </table>
+            </tbody>
+        </table>
     </div>
 </section>

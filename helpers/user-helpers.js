@@ -6,43 +6,46 @@ module.exports = {
 
     doSignup:(userData)=>{
         return new Promise(async(reslove,reject)=>{
-            userData.password =await bcrypt.hash(userData.password,10)
+            userData.Password = await bcrypt.hash(userData.Password,10)
             db.get().collection(collection.USER_COLLECTION).insertOne(userData).then((data)=>{
-                reslove(data)
+                reslove(userData)
             })
         })
     },
+    
 
     dologin:(userData)=>{
-        return new Promise(async(resolve,reject)=>{
+        return new Promise(async(reslove,reject)=>{
             let loginStatus = false
             let response = {}
             
             let user=await db.get().collection(collection.USER_COLLECTION).findOne({Email:userData.Email})
             if(user){
-                bcrypt.compare(userData.password,user.password).then((status)=>{
+                bcrypt.compare(userData.Password,user.Password).then((status)=>{
+
                     if (status) {
                         console.log("Login Success");
+                        response.user = user
+                        response.status = true
+                        reslove(response)
                     } else {
                         console.log("Login Failed");
-                        
+                        reslove({status:false})
                     }
                 })
 
             }else{
                 console.log("Login Failed");
+                reslove({status:false})
             }
-
-            
         })
-        
     }
 
 
 
     // doSignup: (userData) => {
     //     return new Promise(async (resolve, reject) => {
-    //       userData.password = await bcrypt.hash(userData.password, 10);
+    //       userData.Password = await bcrypt.hash(userData.password, 10);
     //       db.get()
     //         .collection(USER_COLLECTION)
     //         .insertOne(userData)

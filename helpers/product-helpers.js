@@ -1,5 +1,6 @@
 var db = require('../config/connection')
-var collection = require('../config/collections')
+var collection = require('../config/collections');
+const { log } = require('handlebars');
 var objectId = require('mongodb').ObjectId
 module.exports = {
     
@@ -10,7 +11,7 @@ module.exports = {
         })
     },
 
-    
+
     getAllProducts:()=>{
         return new Promise(async(reslove,reject)=>{
             let products =await db.get().collection(collection.PRODUCT_COLLECTION).find().toArray()
@@ -20,17 +21,17 @@ module.exports = {
 
     deleteProduct:(prodId)=>{
         return new Promise((reslove,reject)=>{
-            db.get().collection(collection.PRODUCT_COLLECTION).deleteOne({_id: new objectId(prodId)}).then((response)=>{
+            db.get().collection(collection.PRODUCT_COLLECTION).deleteOne({_id:new objectId(prodId)}).then((response)=>{
                 console.log(response);
                 reslove(response)
             })
         })
     },
 
-    getProductDetails:(proId)=>{
+    getProductDetails:(prodId)=>{
             return new Promise((reslove,reject)=>{
-                db.get().collection(collection.PRODUCT_COLLECTION).findOne({_id: new objectId(proId)}).then((product)=>{
-                    reslove(product)
+                db.get().collection(collection.PRODUCT_COLLECTION).findOne({_id:new objectId(prodId)}).then((prodId)=>{
+                    reslove(prodId)
                 })
             })
     },
@@ -38,14 +39,14 @@ module.exports = {
     
     updateProduct:(prodId,ProdDetails)=>{
         return new Promise((reslove,reject)=>{
-            db.get().collection(collection.PRODUCT_COLLECTION).updateOne({_id: new objectId(prodId)},{
+            db.get().collection(collection.PRODUCT_COLLECTION).updateOne({_id:new objectId(prodId)},{
                 $set:{
                     Name:ProdDetails.Name,
                     Description:ProdDetails.Description,
                     Category:ProdDetails.Category,
                     Price:ProdDetails.Price
                 }
-            }).thene((response)=>{
+            }).then((response)=>{
                 reslove(response)
             })
 

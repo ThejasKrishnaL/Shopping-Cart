@@ -1,3 +1,27 @@
-<h1 class="text-center m-5">
-    Hello Welcome To Cart . This Cart Is Empty
-</h1>
+<section>
+    <div class="container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Item</th>
+                    <th scope="col">Title</th>
+                    <th scope="col">Quantity</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <img src="{{this.Image}}">
+                    </td>
+                    <td>{{this.Name}}</td>
+                    <td>
+                        <button class="cart-item-count mr-3">-</button>1<button class="cart-item-count ml-3">+</button>
+                    </td>
+                    <td>
+                        <a href="#" class="btn btn-danger">Remove</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>

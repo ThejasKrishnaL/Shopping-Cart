@@ -1,6 +1,7 @@
 var db = require('../config/connection')
 var collection = require('../config/collections')
 const bcrypt = require('bcrypt')
+var objectId = require('mongodb').ObjectId
 
 module.exports = {
 
@@ -39,47 +40,59 @@ module.exports = {
                 reslove({status:false})
             }
         })
+    },
+
+    addToCart:(prodId,userId)=>{
+        return new Promise(async(reslove,reject)=>{
+                let userCart = await db.get().collection(collection.CART_COLLECTION).findOne({user:new objectId(userId)})
+
+                if(userCart){
+                    db.get().collection(collection.CART_COLLECTION).updateOne({user:new objectId(userCart)},
+                    {
+                            $push:{products: new objectId(prodId)}
+                    }
+                ).then((response)=>{
+                    reslove()
+                })
+
+                }else{
+
+                    let cartObject={
+                        user:objectId(userId),
+                        products:objectId(prodId)
+                    }
+                    db.get().collection(collection.CART_COLLECTION).insertOne(cartObject).then((response)=>{
+                            reslove(response)
+                    })
+
+                }
+        })
+    },
+
+    getCartproducts:(userId)=>{
+        return new Promise(async(reslove,reject)=>{
+            let cartItems = await db.get().collection(collection.CART_COLLECTION).aggregate([
+                {
+                    $match:{user:new objectId(userId)}
+                },
+                {
+                    $lookup:{
+                        from:collection.CART_COLLECTION,
+                        let:{prodList:'$products'},
+                        pipeline:[
+                            {
+                                $match:{
+                                    $expr:{
+                                        $in:['$_id',"$$prodList"]
+                                    }
+                                }
+                            }
+                        ],
+                        as:"cartItems"
+                    }
+                }
+            ]).toArray()
+            reslove(cartItems.insertedId.cartItems)
+        })
     }
-
-
-
-    // doSignup: (userData) => {
-    //     return new Promise(async (resolve, reject) => {
-    //       userData.Password = await bcrypt.hash(userData.password, 10);
-    //       db.get()
-    //         .collection(USER_COLLECTION)
-    //         .insertOne(userData)
-    //         .then((data) => {
-    
-    //           resolve(userData);
-    //         })
-    //     });
-    //   },
-
-
-    // doLogin: (logindata) => {
-    //     return new Promise(async (resolve, reject) => {
-    //       let loginStatus = false;
-    //       let response = {};
-    //       let user = await db
-    //         .get()
-    //         .collection(USER_COLLECTION)
-    //         .findOne({ email: logindata.email });
-    //       if (user) {
-    //         bcrypt.compare(logindata.password, user.password).then((status) => {
-    //           if (status) {
-    //             response.user = user;
-    //             response.status = true;
-    //             resolve(response);
-    //             console.log("Loginned Successfully");
-    //           } else {
-    //             console.log("Login failed");
-    //             resolve({ status: false });
-    //           }
-    //         });
-    //       } else {
-    //         console.log("user not Found");
-    //       }
-    //     });
-    //   }
-}
+}    

@@ -11,6 +11,7 @@ const verifyLogin = (req, res, next) => {
 }
 
 const { response } = require('../app');
+const collections = require('../config/collections');
 
 
 /* GET home page. */
@@ -64,7 +65,7 @@ router.get('/logout', (req, res) => {
 })
 
 router.get('/cart', verifyLogin, async (req, res) => {
-  let products = await userHelpers.getCartproducts(req.session.user.id).then(() => {
+  let products = await userHelpers.getCartProducts(req.session.user._id).then(() => {
     console.log(products);
     res.render('user/cart')
   })
@@ -73,7 +74,7 @@ router.get('/cart', verifyLogin, async (req, res) => {
 
 
 router.get('/add-to-cart/:id', verifyLogin, (req, res) => {
-  userHelpers.addToCart(req.params.id, req.session.user._id).then(() => {
+  userHelpers.addToCart(req.params.id,req.session.user._id).then(() => {
     res.redirect('/')
   })
 })

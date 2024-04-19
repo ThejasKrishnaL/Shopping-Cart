@@ -42,32 +42,101 @@ module.exports = {
         })
     },
 
-    addToCart:(prodId,userId)=>{
-        return new Promise(async(resolve,reject)=>{
-                let userCart = await db.get().collection(collection.CART_COLLECTION).findOne({user: new objectId(userId)})
-                if(userCart){
-                    db.get().collection(collection.CART_COLLECTION)
-                    .updateOne({user: new objectId(userCart.products)},
-                    {
-                            $push:{products: new objectId(prodId)}
-                    }
-                ).then((response)=>{
-                    resolve(response)
+    // addToCart:(prodId,userId)=>{
+    //     let prodObj = {
+    //         item:new objectId(prodId),
+    //         quantity:1
+    //     }
+    //     return new Promise(async(resolve,reject)=>{
+    //             let userCart = await db.get().collection(collection.CART_COLLECTION).findOne({user: new objectId(userId)})
+    //             if(userCart){
+    //                 let proExist = userCart.products.findIndex(product=> product.item== prodId)
+    //                 console.log(proExist);
+
+    //             //     db.get().collection(collection.CART_COLLECTION)
+    //             //     .updateOne({user: new objectId(userCart.products)},
+    //             //     {
+    //             //             $push:{products:prodObj}
+    //             //     }
+    //             // ).then((response)=>{
+    //             //     resolve(response)
+    //             // })
+
+    //             }else{
+
+    //                 let cartObj={
+    //                     user:new objectId(userId),
+    //                     products: [prodObj]
+    //                 }
+    //                 db.get().collection(collection.CART_COLLECTION).insertOne(cartObj).then((response)=>{
+    //                         resolve(response)
+    //                 })
+
+    //             }
+    //     })
+    // },
+
+    addToCart: (proId, userId) => {
+        let proObject = {
+          item: objectId(proId),
+          quantity: 1,
+        };
+        return new Promise(async (resolve, reject) => {
+          let userCart = await db
+            .get()
+            .collection(collection.USERCART)
+            .findOne({ user: objectId(userId) });
+          if (userCart) {
+            let proExist = userCart.product.findIndex(
+              (product) => product.item == proId
+            );
+            if (proExist != -1) {
+              db.get()
+                .collection(collection.USERCART)
+                .updateOne(
+                  { user: objectId(userId), "product.item": objectId(proId) },
+                  {
+                    $inc: { "product.$.quantity": 1 },
+                  }
+                )
+                .then(() => {
+                  resolve();
+                });
+            } else {
+              db.get()
+                .collection(collection.USERCART)
+                .updateOne(
+                  { user: objectId(userId) },
+                  {
+                    $push: { product: proObject },
+                  }
+                )
+                .then((response) => {
+                  resolve();
                 })
-
-                }else{
-
-                    let cartObj={
-                        user:new objectId(userId),
-                        products: new objectId(prodId)
-                    }
-                    db.get().collection(collection.CART_COLLECTION).insertOne(cartObj).then((response)=>{
-                            resolve(response)
-                    })
-
-                }
-        })
-    },
+                .catch((err) => {
+                  return reject(err);
+                });
+            }
+          } else {
+            let cartObj = {
+              user: objectId(userId),
+              product: [proObject],
+            };
+            console.log(cartObj);
+    
+            db.get()
+              .collection(collection.USERCART)
+              .insertOne(cartObj)
+              .then(() => {
+                resolve();
+              })
+              .catch((err) => {
+                reject(err);
+              });
+          }
+        });
+      },
 
     getCartProducts: (userId) => {
         return new Promise(async (resolve, reject) => {

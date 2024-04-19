@@ -6,17 +6,17 @@ var objectId = require('mongodb').ObjectId
 module.exports = {
 
     doSignup:(userData)=>{
-        return new Promise(async(reslove,reject)=>{
+        return new Promise(async(resolve,reject)=>{
             userData.Password = await bcrypt.hash(userData.Password,10)
             db.get().collection(collection.USER_COLLECTION).insertOne(userData).then((data)=>{
-                reslove(userData)
+                resolve(userData)
             })
         })
     },
     
 
     dologin:(userData)=>{
-        return new Promise(async(reslove,reject)=>{
+        return new Promise(async(resolve,reject)=>{
             let loginStatus = false
             let response = {}
             
@@ -28,22 +28,22 @@ module.exports = {
                         console.log("Login Success");
                         response.user = user
                         response.status = true
-                        reslove(response)
+                        resolve(response)
                     } else {
                         console.log("Login Failed");
-                        reslove({status:false})
+                        resolve({status:false})
                     }
                 })
 
             }else{
                 console.log("Login Failed");
-                reslove({status:false})
+                resolve({status:false})
             }
         })
     },
 
     addToCart:(prodId,userId)=>{
-        return new Promise(async(reslove,reject)=>{
+        return new Promise(async(resolve,reject)=>{
                 let userCart = await db.get().collection(collection.CART_COLLECTION).findOne({user: new objectId(userId)})
                 if(userCart){
                     db.get().collection(collection.CART_COLLECTION)
@@ -52,7 +52,7 @@ module.exports = {
                             $push:{products: new objectId(prodId)}
                     }
                 ).then((response)=>{
-                    reslove(response)
+                    resolve(response)
                 })
 
                 }else{
@@ -62,7 +62,7 @@ module.exports = {
                         products: new objectId(prodId)
                     }
                     db.get().collection(collection.CART_COLLECTION).insertOne(cartObj).then((response)=>{
-                            reslove(response)
+                            resolve(response)
                     })
 
                 }
@@ -108,6 +108,17 @@ module.exports = {
         });
       },
 
+
+      getCartCount:(userId)=>{
+        return new Promise(async (resolve,reject)=>{
+            let count = 0
+            let cart = await db.get().collection(collection.CART_COLLECTION).findOne({user: new objectId(userId)})
+            if(cart){
+                count = cart.products.length
+            }
+            resolve(count)
+        })
+}
     // getCartProducts:(userId)=>{
     //     return new Promise(async (resolve,reject)=>{
     //         let cartItems = await db.get().collection(collection.CART_COLLECTION).aggregate([

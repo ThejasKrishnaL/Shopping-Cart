@@ -12,7 +12,7 @@
                 {{#each products}}
                 <tr>
                     <td>
-                        <img src="{{product.Image}}">
+                        <img src="/product-images/{{this._id}}.jpg">
                     </td>
                     <td>{{this.Name}}</td>
                     <td>
@@ -22,7 +22,10 @@
                         <a href="#" class="btn btn-danger">Remove</a>
                     </td>
                 </tr>
+
                 {{/each}}
+
+
             </tbody>
         </table>
     </div>

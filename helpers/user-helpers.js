@@ -45,12 +45,11 @@ module.exports = {
     addToCart:(prodId,userId)=>{
         return new Promise(async(reslove,reject)=>{
                 let userCart = await db.get().collection(collection.CART_COLLECTION).findOne({user: new objectId(userId)})
-
                 if(userCart){
                     db.get().collection(collection.CART_COLLECTION)
-                    .updateOne({user: new objectId(userCart)},
+                    .updateOne({user: new objectId(userCart.products)},
                     {
-                            $push:{products:objectId(prodId)}
+                            $push:{products: new objectId(prodId)}
                     }
                 ).then((response)=>{
                     reslove(response)
@@ -58,11 +57,11 @@ module.exports = {
 
                 }else{
 
-                    let cartObject={
-                        user:objectId(userId),
-                        products:objectId(prodId)
+                    let cartObj={
+                        user:new objectId(userId),
+                        products: new objectId(prodId)
                     }
-                    db.get().collection(collection.CART_COLLECTION).insertOne(cartObject).then((response)=>{
+                    db.get().collection(collection.CART_COLLECTION).insertOne(cartObj).then((response)=>{
                             reslove(response)
                     })
 
@@ -70,31 +69,70 @@ module.exports = {
         })
     },
 
-    getCartProducts:(userId)=>{
-        return new Promise(async (resolve,reject)=>{
-            let cartItems = await db.get().collection(collection.CART_COLLECTION).aggregate([
-                {
-                    $match:{user:objectId(userId)}
+    getCartProducts: (userId) => {
+        return new Promise(async (resolve, reject) => {
+          let cartItems = await db
+            .get()
+            .collection(collection.CART_COLLECTION)
+            .aggregate([
+              {
+                $match: { user: new objectId(userId) },
+              },
+              {
+                $unwind: "$products",
+              },
+              {
+                $project: {
+                  item: "$products.item",
+                  quantity: "$products.quantity",
                 },
-                {
-                    $lookup:{
-                        from:'product',
-                        let:{ProdList:'$products'},
-                        pipline:[
-                            {
-                                $match:{
-                                    $expr:{
-                                        $in:['$_id',"$$prodList"]
-                                    }
-                                }
-                            },
-                         ],
-                          as:'cartItems'
-                    }
-                    
-                }.toArray()
+              },
+              {
+                $lookup: {
+                  from: collection.PRODUCT_COLLECTION,
+                  localField: "item",
+                  foreignField: "_id",
+                  as: "product",
+                },
+              },
+              {
+                $project: {
+                  item: 1,
+                  quantity: 1,
+                  product: { $arrayElemAt: ["$product", 0] },
+                },
+              },
             ])
-            resolve(cartItems)
-     })
-    }
+            .toArray();
+          resolve(cartItems);
+        });
+      },
+
+    // getCartProducts:(userId)=>{
+    //     return new Promise(async (resolve,reject)=>{
+    //         let cartItems = await db.get().collection(collection.CART_COLLECTION).aggregate([
+    //             {
+    //                 $match:{user:new objectId(userId)}
+    //             },
+    //             {
+    //                 $lookup:{
+    //                     from:collection.PRODUCT_COLLECTION,
+    //                     let:{ProdList:'$products'},
+    //                     pipline:[
+    //                         {
+    //                             $match:{
+    //                                 $expr:{
+    //                                     $in:['$_id','$$prodList']
+    //                                 }
+    //                             }
+    //                         },
+    //                      ],
+    //                       as:'cartItems'
+    //                 }
+                    
+    //             }
+    //         ]).toArray()
+    //         resolve(cartItems[0].cartItems)
+    //  })
+    // }
 }

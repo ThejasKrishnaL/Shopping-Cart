@@ -11,12 +11,18 @@
             <tbody>
                 {{#each products}}
                 <tr>
+
+
                     <td>
-                        <img src="/product-images/{{this._id}}.jpg">
+                        <img style="width:70px;height:auto;" src="/product-images/{{this.product._id}}.jpg">
                     </td>
-                    <td>{{this.Name}}</td>
+                    <td>{{this.product.Name}}</td>
+
+
                     <td>
-                        <button class="cart-item-count mr-3">-</button>1<button class="cart-item-count ml-3">+</button>
+                        <button class="cart-item-count mr-3" onclick="changeQuantity('{{this._id}}','{{this.product._id}}',-1)">-</button>
+                        <span id="{{this.product._id}}">{{this.quantity}}</span>
+                        <button class="cart-item-count ml-3" onclick="changeQuantity('{{this._id}}','{{this.product._id}}',1)">+</button>
                     </td>
                     <td>
                         <a href="#" class="btn btn-danger">Remove</a>
@@ -30,3 +36,28 @@
         </table>
     </div>
 </section>
+
+<script>
+    function changeQuantity(cartId,prodId,count){
+        let quantity = parseInt(document.getElementById(prodId).innerHTML)
+        count = parseInt(count)
+        $.ajax({
+            url:'/change-product-quantity'
+            data:{
+                Cart:cartId,
+                product:prodId,
+                count:count
+                quantity:quantity
+            },
+            method:'post',
+            success:(response)=>{
+                if(response.removeProduct){
+                    alert("Product Removed From Cart")
+                    location.reload()
+                }else{
+                    document.getElementById(prodId).innerHTML = quantity+count
+                }
+            }
+        })
+    }
+</script>

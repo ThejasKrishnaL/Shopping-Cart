@@ -50,6 +50,9 @@ app.use(session({secret:"Key",cookie:{maxAge:6000000}}))
 app.use('/', userRouter);
 app.use('/admin', adminRouter);
 
+
+
+
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));

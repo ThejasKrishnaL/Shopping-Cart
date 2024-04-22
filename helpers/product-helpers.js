@@ -50,6 +50,14 @@ module.exports = {
                 reslove(response)
             })
 
-    })}
+    })},
+
+    deleteProduct:(prodId)=>{
+        return new Promise((resolve,reject)=>{
+            db.get.collection(collection.PRODUCT_COLLECTION).deleteOne({_id:new objectId(prodId)}).then((response)=>{
+                resolve(response)
+            })
+        })
+    }
 
 }

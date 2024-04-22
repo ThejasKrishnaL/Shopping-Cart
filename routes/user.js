@@ -80,10 +80,18 @@ router.get('/cart', verifyLogin, async (req, res) => {
 
 
 
-router.get('/add-to-cart/:_id',(req, res) => {
+router.get('/add-to-cart/:id',(req, res) => {
   console.log("API CALL");
-  userHelpers.addToCart(req.params.id,req.session.user._id).then(() => {
+  userHelpers.addToCart(req.params._id,req.session.user._id).then(() => {
     res.json({status:true})
+  })
+})
+
+
+router.post('/change-product-quantity',(req,res,next)=>{
+  console.log(req.body);
+  userHelpers.changeProductQuantity(req.body).then(()=>{
+    
   })
 })
 
